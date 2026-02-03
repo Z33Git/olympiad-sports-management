@@ -1927,10 +1927,19 @@
         document.getElementById('userRole').textContent = currentUser.role;
         
         loadData();
-        importCSVData().then(() => {
-          updateDashboard();
-          populateFilters();
-        });
+        
+        // Check if participant portal is requested
+        if (window.location.hash === '#participantPortal') {
+          document.getElementById('participantLoginCard').classList.remove('hidden');
+          document.getElementById('participantDashboard').classList.add('hidden');
+          currentParticipant = null;
+          showPage('participantPortal');
+        } else {
+          importCSVData().then(() => {
+            updateDashboard();
+            populateFilters();
+          });
+        }
       } else {
         document.getElementById('loginError').classList.remove('hidden');
       }
@@ -3631,6 +3640,19 @@
       renderVip();
       updateDashboard();
     }
+
+    // Check for hash on page load
+    window.addEventListener('load', function() {
+      if (window.location.hash === '#participantPortal') {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('appPage').classList.remove('hidden');
+        loadData();
+        document.getElementById('participantLoginCard').classList.remove('hidden');
+        document.getElementById('participantDashboard').classList.add('hidden');
+        currentParticipant = null;
+        showPage('participantPortal');
+      }
+    });
   </script>
 </body>
 </html>
