@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Participant Attendance Portal - Olympiad Sports Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; padding: 20px; }
+    .container { max-width: 500px; margin: 0 auto; }
+    .card { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header .icon { font-size: 64px; margin-bottom: 16px; }
+    .header h1 { font-size: 24px; color: #1a1a2e; margin-bottom: 8px; }
+    .header p { color: #666; font-size: 14px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px; }
+    .form-group input { width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
+    .form-group input:focus { outline: none; border-color: #4361ee; }
+    .btn { width: 100%; padding: 16px; background: #4361ee; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+    .btn:hover { background: #3651d4; }
+    .btn-present { background: #059669; }
+    .btn-present:hover { background: #047857; }
+    .status { margin-top: 20px; padding: 16px; border-radius: 10px; text-align: center; font-size: 16px; font-weight: 600; }
+    .status.present { background: #d1fae5; color: #059669; }
+    .status.absent { background: #fee2e2; color: #dc2626; }
+    .status.pending { background: #f8f9fa; color: #666; }
+    .participant-info { display: flex; align-items: center; gap: 16px; padding: 20px; background: #f8f9fa; border-radius: 12px; margin-bottom: 20px; }
+    .participant-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, #4361ee, #7209b7); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; }
+    .participant-details h2 { font-size: 20px; color: #1a1a2e; margin-bottom: 4px; }
+    .participant-details p { color: #666; font-size: 14px; }
+    .sports { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .sport-tag { background: #eef2ff; color: #4361ee; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+    .date-selector { margin-bottom: 20px; }
+    .date-selector label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
+    .date-selector input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; }
+    .history { margin-top: 30px; }
+    .history h3 { font-size: 16px; color: #1a1a2e; margin-bottom: 16px; }
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; }
+    .history-date { font-size: 14px; color: #666; }
+    .history-status { font-size: 12px; padding: 4px 12px; border-radius: 10px; }
+    .history-status.present { background: #d1fae5; color: #059669; }
+    .history-status.absent { background: #fee2e2; color: #dc2626; }
+    .logout { margin-top: 20px; text-align: center; }
+    .logout button { background: none; border: none; color: #666; cursor: pointer; font-size: 14px; }
+    .logout button:hover { color: #dc2626; }
+    .error { background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Login Form -->
+    <div id="loginCard" class="card">
+      <div class="header">
+        <div class="icon">📱</div>
+        <h1>Participant Attendance Portal</h1>
+        <p>Enter your email or Participant ID to mark your attendance</p>
+      </div>
+      <div id="loginError" class="error" style="display: none;"></div>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="participantEmail" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+          <label>Or Participant ID</label>
+          <input type="text" id="participantId" placeholder="e.g., P-0001">
+        </div>
+        <button type="submit" class="btn">Continue</button>
+      </form>
+      <p style="text-align: center; margin-top: 20px; color: #999; font-size: 12px;">
+        Use the email or ID you registered with
+      </p>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="card" style="display: none;">
+      <div class="participant-info">
+        <div class="participant-avatar" id="participantAvatar">P</div>
+        <div class="participant-details">
+          <h2 id="participantName">Participant Name</h2>
+          <p id="participantOrg">Organization</p>
+          <div class="sports" id="participantSports"></div>
+        </div>
+      </div>
+
+      <div class="date-selector">
+        <label>Select Date</label>
+        <input type="date" id="attendanceDate">
+      </div>
+
+      <button class="btn btn-present" onclick="markAttendance('Present')">✅ Mark Present</button>
+      
+      <div id="attendanceStatus" class="status pending">
+        Select a date and mark your attendance
+      </div>
+
+      <div class="history">
+        <h3>📜 Your Attendance History</h3>
+        <div id="historyList"></div>
+      </div>
+
+      <div class="logout">
+        <button onclick="logout()">← Mark attendance for another participant</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data storage
+    let participants = [];
+    let attendance = {};
+    let currentParticipant = null;
+
+    // Sport icons
+    const sportIcons = {
+      'Cricket': '🏏', 'Football': '⚽', 'Basketball': '🏀', 'Volleyball': '🏐',
+      'Badminton': '🏸', 'Table Tennis': '🏓', 'Tennis': '🎾', 'Chess': '♟️',
+      'Athletics': '🏃', 'Swimming': '🏊', 'Paddle Tennis': '🎾',
+      'Throwball': '🏐', 'Snooker': '🎱', 'Hockey': '🏑'
+    };
+
+    // Initialize
+    document.getElementById('attendanceDate').value = new Date().toISOString().split('T')[0];
+
+    // Load data from localStorage or use embedded data
+    function loadData() {
+      const savedParticipants = localStorage.getItem('participants');
+      const savedAttendance = localStorage.getItem('attendance');
+      
+      if (savedParticipants) {
+        participants = JSON.parse(savedParticipants);
+      } else {
+        // Use embedded data
+        participants = EMBEDDED_PARTICIPANTS;
+        localStorage.setItem('participants', JSON.stringify(participants));
+      }
+      
+      if (savedAttendance) {
+        attendance = JSON.parse(savedAttendance);
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('participantEmail').value.trim().toLowerCase();
+      const id = document.getElementById('participantId').value.trim();
+      
+      let participant = null;
+      
+      if (email) {
+        participant = participants.find(p => p.email?.toLowerCase() === email);
+      }
+      
+      if (!participant && id) {
+        participant = participants.find(p => p.id === id);
+      }
+      
+      if (!participant) {
+        document.getElementById('loginError').textContent = 'Participant not found! Please check your email or ID.';
+        document.getElementById('loginError').style.display = 'block';
+        return;
+      }
+      
+      currentParticipant = participant;
+      document.getElementById('loginError').style.display = 'none';
+      
+      // Show dashboard
+      document.getElementById('loginCard').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      
+      // Update participant info
+      document.getElementById('participantAvatar').textContent = participant.name.charAt(0);
+      document.getElementById('participantName').textContent = participant.name;
+      document.getElementById('participantOrg').textContent = participant.organization || 'No Organization';
+      
+      document.getElementById('participantSports').innerHTML = participant.sports.map(s => 
+        '<span class="sport-tag">' + (sportIcons[s] || '⚽') + ' ' + s + '</span>'
+      ).join('');
+      
+      checkAttendance();
+      renderHistory();
+    }
+
+    function checkAttendance() {
+      const date = document.getElementById('attendanceDate').value;
+      const status = attendance[date]?.participants?.[currentParticipant?.id];
+      
+      const statusEl = document.getElementById('attendanceStatus');
+      
+      if (status === 'Present') {
+        statusEl.className = 'status present';
+        statusEl.innerHTML = '✅ You are marked as PRESENT for ' + date;
+      } else if (status === 'Absent') {
+        statusEl.className = 'status absent';
+        statusEl.innerHTML = '❌ You are marked as ABSENT for ' + date;
+      } else {
+        statusEl.className = 'status pending';
+        statusEl.innerHTML = '⚪ Attendance not marked for ' + date;
+      }
+    }
+
+    function markAttendance(status) {
+      if (!currentParticipant) return;
+      
+      const date = document.getElementById('attendanceDate').value;
+      
+      if (!attendance[date]) {
+        attendance[date] = { participants: {} };
+      }
+      
+      attendance[date].participants[currentParticipant.id] = status;
+      localStorage.setItem('attendance', JSON.stringify(attendance));
+      
+      alert('✅ Attendance marked as ' + status + ' for ' + date);
+      
+      checkAttendance();
+      renderHistory();
+      
+      // Reset form after marking
+      setTimeout(function() {
+        logout();
+      }, 1500);
+    }
+
+    function renderHistory() {
+      const dates = Object.keys(attendance).sort().slice(-30);
+      const history = dates.map(date => {
+        const status = attendance[date]?.participants?.[currentParticipant?.id];
+        if (status) return { date, status };
+        return null;
+      }).filter(Boolean).reverse();
+      
+      document.getElementById('historyList').innerHTML = history.length > 0 ? history.map(h => 
+        '<div class="history-item"><span class="history-date">' + h.date + '</span><span class="history-status ' + h.status.toLowerCase() + '">' + h.status + '</span></div>'
+      ).join('') : '<p style="color: #999; text-align: center; padding: 20px;">No attendance history yet</p>';
+    }
+
+    function logout() {
+      currentParticipant = null;
+      document.getElementById('participantEmail').value = '';
+      document.getElementById('participantId').value = '';
+      document.getElementById('loginCard').style.display = 'block';
+      document.getElementById('dashboard').style.display = 'none';
+    }
+
+    // Listen for attendance updates
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'attendanceUpdated') {
+        if (currentParticipant) {
+          loadData();
+          checkAttendance();
+          renderHistory();
+        }
+      }
+    });
+
+    // Load data on page load
+    loadData();
+
+    // Embedded participant data (will be replaced with actual data)
+    EMBEDDED_PARTICIPANTS = [];
+  </script>
+</body>
+</html>
