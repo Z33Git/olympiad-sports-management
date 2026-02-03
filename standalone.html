@@ -3648,8 +3648,8 @@
       updateDashboard();
     }
 
-    // Check for hash on page load
-    window.addEventListener('load', function() {
+    // Check for hash on page load - using DOMContentLoaded for faster response
+    function checkParticipantPortal() {
       if (window.location.hash === '#participantPortal') {
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('appPage').classList.remove('hidden');
@@ -3657,8 +3657,36 @@
         document.getElementById('participantLoginCard').classList.remove('hidden');
         document.getElementById('participantDashboard').classList.add('hidden');
         currentParticipant = null;
-        showPage('participantPortal');
+        
+        // Hide all other pages, show only participant portal
+        document.getElementById('dashboardPage').classList.add('hidden');
+        document.getElementById('participantsPage').classList.add('hidden');
+        document.getElementById('vipPage').classList.add('hidden');
+        document.getElementById('sportsPage').classList.add('hidden');
+        document.getElementById('teamsPage').classList.add('hidden');
+        document.getElementById('attendancePage').classList.add('hidden');
+        document.getElementById('shieldsPage').classList.add('hidden');
+        document.getElementById('shieldAssignmentPage').classList.add('hidden');
+        document.getElementById('mcPage').classList.add('hidden');
+        document.getElementById('eventdayPage').classList.add('hidden');
+        document.getElementById('playersPage').classList.add('hidden');
+        document.getElementById('participantPortalPage').classList.remove('hidden');
       }
+    }
+
+    // Run on DOMContentLoaded (faster than load event)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkParticipantPortal);
+    } else {
+      checkParticipantPortal();
+    }
+
+    // Also check again after a short delay to ensure DOM is ready
+    setTimeout(checkParticipantPortal, 100);
+
+    // Handle hash changes (if user navigates while on page)
+    window.addEventListener('hashchange', function() {
+      checkParticipantPortal();
     });
   </script>
 </body>
