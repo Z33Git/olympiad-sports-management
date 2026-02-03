@@ -1152,6 +1152,19 @@
 
     function initializeSampleData() {
       participants = [
+        { id: 'P-0001', name: 'Sample Participant', designation: 'Sample Designation', organization: 'Sample Organization', phone: '03001234567', email: 'sample@example.com', sports: ['Cricket', 'Football'] },
+      ];
+      
+      vips = [
+        { id: 'V-001', name: 'Sample VIP', designation: 'Chief Guest', organization: 'Sample Organization', ranking: 1, status: 'Active', shields_given: 0, shield_budget: 5 },
+      ];
+      
+      shields = [
+        { id: 'SH-0001', recipient: 'Sample Recipient', recipientId: 'P-0001', awardedBy: 'Sample VIP', awardedById: 'V-001', sport: 'Cricket', reason: 'Sample award', date: '2024-02-01' },
+      ];
+      
+      saveData();
+    }
         { id: 'P-0001', name: 'Zafar Imam', designation: 'Head of IT', organization: 'Fauji Akbar Portia Marine Terminals', phone: '0331-8203888', email: 'Zafar.imam@fapterminals.com', sports: ['Paddle Tennis', 'Cricket', 'Snooker'] },
         { id: 'P-0002', name: 'Khawar Saleem', designation: 'Deputy Manager Digital Trust Assurance', organization: 'SGS Pakistan Private Limited', phone: '0323 2836231', email: 'Khawar.saleem@sgs.com', sports: ['Paddle Tennis', 'Cricket', 'Snooker'] },
         { id: 'P-0003', name: 'Muhammad Zeeshan Khan', designation: 'Head of IT', organization: 'Jubilee General Insurance', phone: '00923468211069', email: 'mzeeshankhan312@gmail.com', sports: ['Football', 'Cricket'] },
