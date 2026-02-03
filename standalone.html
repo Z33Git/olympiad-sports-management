@@ -3323,8 +3323,15 @@
       
       alert('✅ Attendance marked as ' + status + ' for ' + date);
       
-      checkMyAttendance();
-      renderMyAttendanceHistory();
+      // Reset form and logout participant
+      document.getElementById('participantEmail').value = '';
+      document.getElementById('participantId').value = '';
+      currentParticipant = null;
+      document.getElementById('participantDashboard').classList.add('hidden');
+      document.getElementById('participantLoginCard').classList.remove('hidden');
+      document.getElementById('attendanceStatus').className = 'attendance-status-display pending';
+      document.getElementById('attendanceStatus').innerHTML = 'Select a date and mark your attendance';
+      document.getElementById('participantAttendanceHistory').innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No attendance history yet</p>';
       
       // Refresh main app if on same page
       if (document.getElementById('attendancePage').classList.contains('hidden') === false) {
